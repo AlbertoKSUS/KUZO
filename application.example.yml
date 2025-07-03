@@ -1,48 +1,24 @@
 server:
   port: 2333
+  address: 0.0.0.0
 
 lavalink:
   server:
-    password: ''
+    password: ""
     sources:
       youtube: false
-      soundcloud: true
-      bandcamp: true
-      twitch: true
-      vimeo: true
-      http: true
-      local: false
-
-  resamplingQuality: HIGH
-  bufferDurationMs: 400
-  frameBufferDurationMs: 500
-  volume: 100
-
-filters:
-  volume: true
-  equalizer: true
-  karaoke: true
-  timescale: true
-  tremolo: true
-  vibrato: true
-  rotation: true
-  distortion: true
-  channelMix: true
-  lowPass: true
 
 plugins:
-  lavasrc:
-    enabled: true
-    client-id: ''
-    client-secret: ''
-
   youtube:
+    oauth:
+      enabled: true
+      refreshToken: ""
+      skipInitialization: true
     enabled: true
     allowSearch: true
     allowDirectVideoIds: true
     allowDirectPlaylistIds: true
     clients:
       - MUSIC
-      - ANDROID_VR
       - WEB
-      - WEBEMBEDDED
+      - TV
