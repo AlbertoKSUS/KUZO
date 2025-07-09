@@ -1,6 +1,6 @@
 # 🎶 KuzoBot
 
-**KuzoBot** is a powerful Discord bot, which currently only has the functionality of a music bot, built with [discord.py](https://github.com/Rapptz/discord.py), [Wavelink](https://github.com/PythonistaGuild/Wavelink), and [Spotipy](https://github.com/plamere/spotipy). It supports music playback from YouTube and can intelligently handle Spotify links (tracks, playlists, and albums) by searching their counterparts on YouTube.
+**KuzoBot** is a powerful Discord bot focused on music playback, built with [discord.py](https://github.com/Rapptz/discord.py), [Wavelink](https://github.com/PythonistaGuild/Wavelink), and [Spotipy](https://github.com/plamere/spotipy). It supports music from YouTube and intelligently handles Spotify links (tracks, playlists, and albums) by searching for their counterparts on YouTube.
 
 ---
 
@@ -13,6 +13,8 @@
 - 🔊 Volume and playback controls
 - 📜 Now Playing + Rich embeds
 - ⚙️ Lavalink integration
+- ⏭️ Play next command
+- 🤖 Auto-disconnect on inactivity or alone in voice
 
 ---
 
@@ -33,7 +35,7 @@ pip install -r requirements.txt
 
 ### 3. Configure your environment
 
-Create a file called `secret.py` in the root directory and add your Spotify credentials:
+Create a file called `secret.py` in the root directory and add your credentials:
 
 ```python
 DISCORD_TOKEN = 'your_discord_token'
@@ -41,17 +43,15 @@ SPOTIFY_CLIENT_ID = 'your_spotify_client_id'
 SPOTIFY_CLIENT_SECRET = 'your_spotify_client_secret'
 ```
 
-Make sure you also configure your Discord bot token in your `main.py` or environment variables (not included here for security).
-
 ### 4. Run a Lavalink server
 
-You must have a Lavalink server running locally or remotely. Example (local setup):
+You must have a Lavalink server running. Example (local setup):
 
 ```bash
 java -jar Lavalink.jar
 ```
 
-Ensure your `Node` is pointed to `http://localhost:2333` with the correct password.
+Ensure your `Node` is configured for `http://localhost:2333` with the correct password.
 
 ### 5. Start the bot
 
@@ -63,36 +63,38 @@ python main.py
 
 ## 💻 Commands
 
-| Command             | Aliases         | Description                                                               |
-|---------------------|------------------|---------------------------------------------------------------------------|
-| `!play <query>`     | —                | Play a song, playlist, or album. Supports Spotify links and search terms. |
-| `!queue`            | —                | Display the current music queue.                                          |
-| `!skip`             | —                | Skip the current track.                                                   |
-| `!nightcore`        | —                | Apply a nightcore (pitch + speed) filter.                                 |
-| `!toggle`           | `pause`, `resume`| Toggle pause/resume playback.                                             |
-| `!volume <0-100>`   | —                | Set the playback volume.                                                  |
-| `!disconnect`       | `dc`             | Disconnect the bot from the voice channel.                                |
+| Command               | Aliases         | Description                                                               |
+|----------------------|------------------|---------------------------------------------------------------------------|
+| `!play <query>`      | —                | Play a song, playlist, or album. Supports Spotify links and search terms. |
+| `!playnext <query>`  | —                | Queue a track to be played next. Supports Spotify track links.            |
+| `!queue`             | —                | Display the current music queue.                                          |
+| `!skip`              | —                | Skip the current track.                                                   |
+| `!nightcore`         | —                | Apply a nightcore (pitch + speed) filter.                                 |
+| `!toggle`            | `pause`, `resume`| Toggle pause/resume playback.                                             |
+| `!volume <0-100>`    | —                | Set the playback volume.                                                  |
+| `!disconnect`        | `dc`             | Disconnect the bot from the voice channel.                                |
 
 ---
 
 ## 🎵 Spotify Integration
 
-KuzoBot can interpret and play content from the following Spotify links:
+KuzoBot can interpret and play:
 
 - **Tracks**
 - **Playlists**
 - **Albums**
 
-It fetches the metadata via Spotify's API and performs a YouTube search using the track title and artist name.
+Spotify data is used to perform YouTube searches based on the track name and artist.
 
 ---
 
 ## 🧠 How It Works
 
-- Uses Wavelink to communicate with Lavalink for audio streaming.
-- Detects Spotify URLs and resolves them using the Spotify Web API.
-- Converts Spotify tracks into YouTube searches via `ytsearch:` queries.
-- Sends rich embed messages for now-playing and queue info.
+- Uses Wavelink to stream via Lavalink.
+- Detects Spotify URLs and fetches metadata with Spotipy.
+- Converts Spotify items into `ytsearch:` YouTube queries.
+- Sends rich embeds when tracks start and for queue info.
+- Disconnects if left alone or inactive for set durations.
 
 ---
 
@@ -101,18 +103,18 @@ It fetches the metadata via Spotify's API and performs a YouTube search using th
 ```
 kuzobot/
 ├── commands/
-│   └── music.py           # All music commands (play, skip, queue, etc.)
-├── secret.py              # Spotify credentials (not included in repo)
+│   └── music.py           # Music command definitions
+├── secret.py              # Credentials (not included in repo)
 ├── bot.py                 # Bot setup
 ├── main.py                # Bot initialization
-└── README.md              # You are here
+└── README.md              # Project documentation
 ```
 
 ---
 
 ## ⚠️ Disclaimer
 
-This bot does **not** stream directly from Spotify. It uses Spotify data to search for equivalent content on YouTube. This is done in compliance with YouTube and Spotify's usage guidelines.
+This bot does **not** stream directly from Spotify. Instead, it uses metadata to search for content on YouTube in compliance with usage guidelines.
 
 ---
 
@@ -127,8 +129,8 @@ This bot does **not** stream directly from Spotify. It uses Spotify data to sear
 
 ## 📃 License
 
-This project is licensed under the MIT License.
+Licensed under the MIT License.
 
 ---
 
-### ✨ Enjoy your bot powered by KuzoBot!
+### ✨ Enjoy your music with KuzoBot!
