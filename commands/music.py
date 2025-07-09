@@ -1,3 +1,4 @@
+import asyncio
 from typing import cast
 
 import discord
@@ -48,6 +49,29 @@ class MusicCommands(commands.Cog):
         if not player.queue.is_empty:
             next_track = await player.queue.get_wait()
             await player.play(next_track)
+
+        else:
+            await asyncio.sleep(600)
+            if not player.playing and player.queue.is_empty:
+                await player.disconnect()
+                await player.home.send('⏱️ I have been disconnected due to inactivity (10 minutes without music).')
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState,
+                                    after: discord.VoiceState):
+        if not member.guild.voice_client:
+            return
+
+        voice_client = member.guild.voice_client
+        if not isinstance(voice_client, wavelink.Player):
+            return
+
+        # If the bot is alone in the voice channel, wait 3 minutes before disconnecting.
+        if voice_client.channel and len([m for m in voice_client.channel.members if not m.bot]) == 0:
+            await asyncio.sleep(180)
+            if len([m for m in voice_client.channel.members if not m.bot]) == 0:
+                await voice_client.disconnect()
+                await voice_client.home.send('👋 I have disconnected because I am alone on the voice channel.')
 
     @commands.command()
     async def play(self, ctx: commands.Context, *, query: str) -> None:
