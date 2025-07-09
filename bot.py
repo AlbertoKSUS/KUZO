@@ -44,7 +44,6 @@ class KuzoBot(commands.Bot):
     async def on_ready(self) -> None:
         self.log.info(f'✅ Logged in as {self.user} ({self.user.id})')
 
-
     async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload) -> None:
         self.log.info(f'🎧 Lavalink node connected: {payload.node!r} | Resumed: {payload.resumed}')
 
@@ -64,3 +63,13 @@ class KuzoBot(commands.Bot):
             embed.add_field(name='Album', value=track.album.name)
 
         await player.home.send(embed=embed)
+
+    async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
+        player: wavelink.Player | None = payload.player
+
+        if not player:
+            return
+
+        if not player.queue.is_empty:
+            next_track = await player.queue.get_wait()
+            await player.play(next_track)
