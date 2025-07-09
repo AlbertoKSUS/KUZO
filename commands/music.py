@@ -20,6 +20,35 @@ class MusicCommands(commands.Cog):
             )
         )
 
+    @commands.Cog.listener()
+    async def on_wavelink_track_start(self, payload: wavelink.TrackStartEventPayload) -> None:
+        player: wavelink.Player | None = payload.player
+        track: wavelink.Playable = payload.track
+
+        if not player:
+            return
+
+        embed = discord.Embed(title='🎶 Now Playing', description=f'**{track.title}** by `{track.author}`')
+
+        if track.artwork:
+            embed.set_thumbnail(url=track.artwork)
+
+        if track.album.name:
+            embed.add_field(name='Album', value=track.album.name)
+
+        await player.home.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
+        player: wavelink.Player | None = payload.player
+
+        if not player:
+            return
+
+        if not player.queue.is_empty:
+            next_track = await player.queue.get_wait()
+            await player.play(next_track)
+
     @commands.command()
     async def play(self, ctx: commands.Context, *, query: str) -> None:
         """Command to play a track or playlist."""
