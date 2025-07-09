@@ -108,6 +108,45 @@ class MusicCommands(commands.Cog):
             await player.play(player.queue.get(), volume=30)
 
     @commands.command()
+    async def playnext(self, ctx: commands.Context, *, query: str) -> None:
+        """Play a track as the next song in the queue."""
+        if not ctx.guild or not ctx.author.voice:
+            return await ctx.send('🔇 You must be in a voice channel to use this command.')
+
+        player: wavelink.Player = cast(wavelink.Player, ctx.voice_client)
+
+        if not player:
+            player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
+
+        # Set home channel if not already set.
+        if not hasattr(player, 'home'):
+            player.home = ctx.channel
+        elif player.home != ctx.channel:
+            return await ctx.send(f'⚠️ I\'m already active in {player.home.mention}.')
+
+        # Detect Spotify track links.
+        if 'open.spotify.com' in query and 'track' in query:
+            await ctx.send('🔄 Spotify track detected. Searching on YouTube...')
+            track_id = query.split('track/')[1].split('?')[0]
+            track_info = self.sp.track(track_id)
+            query = f"ytsearch:{track_info['name']} {track_info['artists'][0]['name']}"
+
+        # Perform search.
+        results = await wavelink.Playable.search(query)
+        if not results:
+            return await ctx.send('❌ No results found.')
+
+        if isinstance(results, wavelink.Playlist):
+            return await ctx.send('⚠️ You can only use `playnext` with single tracks.')
+
+        track = results[0]
+        await ctx.send(f'⏭️ Track `{track.title}` will play next!')
+        await player.queue.put_at(0, track)
+
+        if not player.playing:
+            await player.play(player.queue.get(), volume=30)
+
+    @commands.command()
     async def queue(self, ctx: commands.Context) -> None:
         """Command to view the queue."""
         player = cast(wavelink.Player, ctx.voice_client)
